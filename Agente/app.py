@@ -3,6 +3,7 @@ import logging
 from config import load_config
 from llm import call_llm
 from graph import build_graph
+from tools import CLOCK_TOOLS
 
 SYSTEM_PROMPT = "Rispondi in italiano. Usa lo strumento orologio quando l'utente chiede l'ora o la data."
 EXIT_WORD = "esci"
@@ -35,7 +36,7 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     base_url, model = load_config()
     llm_fn = lambda msgs, tools: call_llm(base_url, model, msgs, tools)
-    graph = build_graph(llm_fn)
+    graph = build_graph(llm_fn, tools=CLOCK_TOOLS)
     run_chat(graph)
 
 
