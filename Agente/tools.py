@@ -1,6 +1,8 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from convert import convert_units, CONVERT_TOOL_SCHEMA
+
 
 def get_current_time(timezone, now=None):
     try:
@@ -29,4 +31,8 @@ CLOCK_TOOL_SCHEMA = {
     },
 }
 CLOCK_TOOLS = [CLOCK_TOOL_SCHEMA]
-TOOL_REGISTRY = {"get_current_time": get_current_time}
+TOOLS = [CLOCK_TOOL_SCHEMA, CONVERT_TOOL_SCHEMA]
+TOOL_REGISTRY = {
+    "get_current_time": get_current_time,
+    "convert_units": convert_units,
+}
