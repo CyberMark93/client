@@ -33,13 +33,20 @@ def _get(item_id, items):
 
 @mcp.tool()
 def search_catalog(query: str) -> str:
-    """Cerca strumenti di laboratorio per nome o categoria."""
+    """Cerca strumenti nel catalogo del laboratorio per nome o categoria (corrispondenza
+    per sottostringa, maiuscole/minuscole indifferenti). Passa UN solo termine semplice,
+    non una frase: il nome di uno strumento (es. 'oscilloscopio', 'multimetro') oppure una
+    categoria (una tra: misura, utensili, alimentazione, componenti, sicurezza). Restituisce
+    id, nome e categoria di ogni strumento corrispondente, o un messaggio se non ce ne sono."""
     return _search(query, _load_catalog())
 
 
 @mcp.tool()
 def get_item(item_id: str) -> str:
-    """Restituisce il dettaglio di uno strumento di laboratorio dato il suo id."""
+    """Restituisce il dettaglio completo di uno strumento dato il suo identificativo esatto
+    (es. 'MIS-002', 'UTE-010'): nome, categoria, descrizione e quantità disponibile. Usa
+    questo strumento quando conosci già l'id; per trovarlo da nome o categoria usa prima
+    search_catalog."""
     return _get(item_id, _load_catalog())
 
 
