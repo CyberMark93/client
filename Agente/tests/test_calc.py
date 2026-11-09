@@ -53,3 +53,44 @@ def test_divisione_per_zero():
 
 def test_espressione_troppo_lunga():
     assert calc.calculate("1+" * 300 + "1") == "espressione troppo lunga"
+
+
+def test_potenza():
+    assert calc.calculate("2 ** 10") == "2 ** 10 = 1024"
+
+
+def test_modulo():
+    assert calc.calculate("17 % 5") == "17 % 5 = 2"
+
+
+def test_divisione_intera():
+    assert calc.calculate("17 // 5") == "17 // 5 = 3"
+
+
+def test_potenza_entro_il_cap():
+    # 10**1000 = 1001 cifre: entro il limite, calcolata (verifica che NON venga rifiutata)
+    assert calc.calculate("10 ** 1000").startswith("10 ** 1000 = 1")
+
+
+def test_potenza_oltre_il_cap():
+    assert calc.calculate("10 ** 1001") == "risultato troppo grande"
+
+
+def test_potenza_annidata_oltre_il_cap():
+    assert calc.calculate("(10 ** 1000) ** 2") == "risultato troppo grande"
+
+
+def test_torre_di_potenze_oltre_il_cap():
+    assert calc.calculate("10 ** 10 ** 10") == "risultato troppo grande"
+
+
+def test_base_negativa_esponente_frazionario():
+    assert calc.calculate("(-8) ** 0.5") == "risultato non valido"
+
+
+def test_modulo_per_zero():
+    assert calc.calculate("5 % 0") == "divisione per zero"
+
+
+def test_divisione_intera_per_zero():
+    assert calc.calculate("5 // 0") == "divisione per zero"
