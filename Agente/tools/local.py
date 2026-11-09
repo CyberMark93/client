@@ -33,8 +33,9 @@ CLOCK_TOOL_SCHEMA = {
     },
 }
 CLOCK_TOOLS = [CLOCK_TOOL_SCHEMA]
-TOOLS = [CLOCK_TOOL_SCHEMA, CONVERT_TOOL_SCHEMA, CALC_TOOL_SCHEMA, DATE_TOOL_SCHEMA]
-TOOL_REGISTRY = {
+
+LOCAL_TOOLS = [CLOCK_TOOL_SCHEMA, CONVERT_TOOL_SCHEMA, CALC_TOOL_SCHEMA, DATE_TOOL_SCHEMA]
+LOCAL_REGISTRY = {
     "get_current_time": get_current_time,
     "convert_units": convert_units,
     "calculate": calculate,
