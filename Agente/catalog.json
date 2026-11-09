@@ -1,0 +1,11 @@
+[
+  {"id": "MIS-001", "nome": "Multimetro digitale", "categoria": "misura", "descrizione": "Misura tensione, corrente e resistenza.", "quantita_disponibile": 4},
+  {"id": "MIS-002", "nome": "Oscilloscopio", "categoria": "misura", "descrizione": "Visualizza segnali elettrici nel tempo.", "quantita_disponibile": 1},
+  {"id": "MIS-003", "nome": "Generatore di funzioni", "categoria": "misura", "descrizione": "Genera forme d'onda di test.", "quantita_disponibile": 2},
+  {"id": "UTE-010", "nome": "Saldatore a stagno", "categoria": "utensili", "descrizione": "Per saldature elettroniche.", "quantita_disponibile": 7},
+  {"id": "UTE-011", "nome": "Stazione dissaldante", "categoria": "utensili", "descrizione": "Rimozione di componenti saldati.", "quantita_disponibile": 2},
+  {"id": "ALI-020", "nome": "Alimentatore da banco", "categoria": "alimentazione", "descrizione": "Tensione e corrente regolabili.", "quantita_disponibile": 3},
+  {"id": "COM-030", "nome": "Breadboard", "categoria": "componenti", "descrizione": "Prototipazione senza saldatura.", "quantita_disponibile": 25},
+  {"id": "COM-031", "nome": "Kit resistori", "categoria": "componenti", "descrizione": "Assortimento di resistori 1/4W.", "quantita_disponibile": 15},
+  {"id": "SIC-040", "nome": "Occhiali di protezione", "categoria": "sicurezza", "descrizione": "Protezione per gli occhi.", "quantita_disponibile": 30}
+]
