@@ -3,6 +3,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from convert import convert_units, CONVERT_TOOL_SCHEMA
 from calc import calculate, CALC_TOOL_SCHEMA
+from dates import date_tool, DATE_TOOL_SCHEMA
 
 
 def get_current_time(timezone, now=None):
@@ -32,9 +33,10 @@ CLOCK_TOOL_SCHEMA = {
     },
 }
 CLOCK_TOOLS = [CLOCK_TOOL_SCHEMA]
-TOOLS = [CLOCK_TOOL_SCHEMA, CONVERT_TOOL_SCHEMA, CALC_TOOL_SCHEMA]
+TOOLS = [CLOCK_TOOL_SCHEMA, CONVERT_TOOL_SCHEMA, CALC_TOOL_SCHEMA, DATE_TOOL_SCHEMA]
 TOOL_REGISTRY = {
     "get_current_time": get_current_time,
     "convert_units": convert_units,
     "calculate": calculate,
+    "date_tool": date_tool,
 }
