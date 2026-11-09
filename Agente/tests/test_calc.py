@@ -94,3 +94,32 @@ def test_modulo_per_zero():
 
 def test_divisione_intera_per_zero():
     assert calc.calculate("5 // 0") == "divisione per zero"
+
+
+import json
+
+import tools
+from graph import build_graph
+
+
+def test_registry_espone_calculate():
+    assert tools.TOOL_REGISTRY["calculate"] is calc.calculate
+
+
+def test_grafo_instrada_calculate():
+    chiamata = {
+        "role": "assistant", "content": "",
+        "tool_calls": [{"id": "c1", "type": "function",
+                        "function": {"name": "calculate",
+                                     "arguments": json.dumps({"expression": "2 + 3 * 4"})}}],
+    }
+    risposte = [chiamata, {"role": "assistant", "content": "Fa 14."}]
+
+    def fake_llm(messages, tools_arg):
+        return risposte.pop(0)
+
+    g = build_graph(fake_llm, tools=tools.TOOLS)
+    out = g.invoke({"messages": [{"role": "user", "content": "calcola"}], "steps": 0})
+    roles = [m["role"] for m in out["messages"]]
+    assert roles == ["user", "assistant", "tool", "assistant"]
+    assert out["messages"][2]["content"] == "2 + 3 * 4 = 14"

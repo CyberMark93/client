@@ -7,7 +7,8 @@ from tools import TOOLS
 
 SYSTEM_PROMPT = (
     "Rispondi in italiano. Usa lo strumento orologio quando l'utente chiede l'ora o la data. "
-    "Usa lo strumento di conversione quando l'utente chiede di convertire un valore tra unità di misura."
+    "Usa lo strumento di conversione quando l'utente chiede di convertire un valore tra unità di misura. "
+    "Usa la calcolatrice quando l'utente chiede di calcolare un'espressione aritmetica."
 )
 EXIT_WORD = "esci"
 
