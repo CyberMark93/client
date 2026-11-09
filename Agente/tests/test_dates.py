@@ -92,3 +92,59 @@ def test_load_estensione_non_supportata(tmp_path):
 def test_holidays_file_esempio_caricabile():
     h = dates.load_holidays(dates.HOLIDAYS_PATH)
     assert datetime.date(2026, 12, 25) in h
+
+
+def test_business_days_between_iniettato():
+    hol = {datetime.date(2026, 12, 25)}
+    assert dates.date_tool("business_days_between", start="2026-12-21", end="2026-12-28", holidays=hol) \
+        == "da 2026-12-21 a 2026-12-28: 4 giorni lavorativi"
+
+
+def test_business_days_intervallo_invertito():
+    assert dates.date_tool("business_days_between", start="2026-12-28", end="2026-12-21", holidays=set()) \
+        == "intervallo invertito"
+
+
+def test_deadline_iniettato():
+    hol = {datetime.date(2026, 12, 25)}
+    assert dates.date_tool("deadline", start="2026-12-23", days=3, holidays=hol) \
+        == "scadenza: 3 giorni lavorativi dopo 2026-12-23 = 2026-12-29"
+
+
+def test_deadline_giorni_non_positivi():
+    assert dates.date_tool("deadline", start="2026-12-23", days=0, holidays=set()) \
+        == "i giorni devono essere positivi"
+
+
+def test_business_days_usa_file_default():
+    out = dates.date_tool("business_days_between", start="2026-12-21", end="2026-12-28")
+    assert out == "da 2026-12-21 a 2026-12-28: 4 giorni lavorativi"
+
+
+import json as _json
+
+import tools
+from graph import build_graph
+
+
+def test_registry_espone_date_tool():
+    assert tools.TOOL_REGISTRY["date_tool"] is dates.date_tool
+
+
+def test_grafo_instrada_date_tool():
+    chiamata = {
+        "role": "assistant", "content": "",
+        "tool_calls": [{"id": "c1", "type": "function",
+                        "function": {"name": "date_tool",
+                                     "arguments": _json.dumps({"operation": "weekday", "start": "2026-12-25"})}}],
+    }
+    risposte = [chiamata, {"role": "assistant", "content": "È venerdì."}]
+
+    def fake_llm(messages, tools_arg):
+        return risposte.pop(0)
+
+    g = build_graph(fake_llm, tools=tools.TOOLS)
+    out = g.invoke({"messages": [{"role": "user", "content": "che giorno"}], "steps": 0})
+    roles = [m["role"] for m in out["messages"]]
+    assert roles == ["user", "assistant", "tool", "assistant"]
+    assert out["messages"][2]["content"] == "2026-12-25 è venerdì"

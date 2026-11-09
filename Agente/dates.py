@@ -86,6 +86,34 @@ def _require_int(value):
     return value
 
 
+def _is_business_day(d, holidays):
+    return d.weekday() < 5 and d not in holidays
+
+
+def business_days_between(start, end, holidays):
+    if end < start:
+        raise _DateError("intervallo invertito")
+    count = 0
+    cur = start
+    while cur < end:
+        if _is_business_day(cur, holidays):
+            count += 1
+        cur += timedelta(days=1)
+    return count
+
+
+def deadline(start, days, holidays):
+    if days <= 0:
+        raise _DateError("i giorni devono essere positivi")
+    cur = start
+    n = 0
+    while n < days:
+        cur += timedelta(days=1)
+        if _is_business_day(cur, holidays):
+            n += 1
+    return cur
+
+
 def date_tool(operation, start=None, end=None, days=None, holidays=None):
     try:
         if operation == "weekday":
@@ -99,6 +127,18 @@ def date_tool(operation, start=None, end=None, days=None, holidays=None):
             d1 = _parse_date(_require(start, operation))
             d2 = _parse_date(_require(end, operation))
             return f"da {d1.isoformat()} a {d2.isoformat()}: {(d2 - d1).days} giorni"
+        if operation == "business_days_between":
+            d1 = _parse_date(_require(start, operation))
+            d2 = _parse_date(_require(end, operation))
+            hol = holidays if holidays is not None else load_holidays(HOLIDAYS_PATH)
+            n = business_days_between(d1, d2, hol)
+            return f"da {d1.isoformat()} a {d2.isoformat()}: {n} giorni lavorativi"
+        if operation == "deadline":
+            d = _parse_date(_require(start, operation))
+            n = _require_int(days)
+            hol = holidays if holidays is not None else load_holidays(HOLIDAYS_PATH)
+            r = deadline(d, n, hol)
+            return f"scadenza: {n} giorni lavorativi dopo {d.isoformat()} = {r.isoformat()}"
         return f"operazione non riconosciuta: {operation}"
     except _DateError as e:
         return str(e)
