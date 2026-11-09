@@ -3,13 +3,15 @@ import logging
 from config import load_config
 from llm import call_llm
 from graph import build_graph
-from tools import TOOLS
+from tools import TOOLS, TOOL_REGISTRY
+from tools.mcp_client import discover_mcp_tools
 
 SYSTEM_PROMPT = (
     "Rispondi in italiano. Usa lo strumento orologio quando l'utente chiede l'ora o la data. "
     "Usa lo strumento di conversione quando l'utente chiede di convertire un valore tra unità di misura. "
     "Usa la calcolatrice quando l'utente chiede di calcolare un'espressione aritmetica. "
-    "Usa lo strumento date per giorni della settimana, differenze tra date, giorni lavorativi e scadenze."
+    "Usa lo strumento date per giorni della settimana, differenze tra date, giorni lavorativi e scadenze. "
+    "Usa il catalogo (search_catalog, get_item) quando l'utente cerca strumenti di laboratorio o chiede il dettaglio di uno strumento."
 )
 EXIT_WORD = "esci"
 
@@ -41,7 +43,14 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     base_url, model = load_config()
     llm_fn = lambda msgs, tools: call_llm(base_url, model, msgs, tools)
-    graph = build_graph(llm_fn, tools=TOOLS)
+    all_tools = TOOLS
+    try:
+        mcp_schemas, mcp_registry = discover_mcp_tools()
+        TOOL_REGISTRY.update(mcp_registry)
+        all_tools = TOOLS + mcp_schemas
+    except Exception as exc:  # degradazione: l'app parte coi soli tool locali
+        logging.getLogger(__name__).warning("discovery MCP fallita: %s", exc)
+    graph = build_graph(llm_fn, tools=all_tools)
     run_chat(graph)
 
 

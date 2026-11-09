@@ -30,3 +30,32 @@ def test_wrapper_registry_invoca_mcp():
     _, registry = mcp_client.discover_mcp_tools()
     out = registry["get_item"](item_id="MIS-002")
     assert "Oscilloscopio" in out
+
+
+import json as _json
+
+import tools
+from graph import build_graph
+
+
+def test_grafo_instrada_tool_mcp():
+    schemas, registry = mcp_client.discover_mcp_tools()
+    tools.TOOL_REGISTRY.update(registry)
+    all_tools = tools.TOOLS + schemas
+
+    chiamata = {
+        "role": "assistant", "content": "",
+        "tool_calls": [{"id": "c1", "type": "function",
+                        "function": {"name": "search_catalog",
+                                     "arguments": _json.dumps({"query": "oscilloscopio"})}}],
+    }
+    risposte = [chiamata, {"role": "assistant", "content": "Trovato."}]
+
+    def fake_llm(messages, tools_arg):
+        return risposte.pop(0)
+
+    g = build_graph(fake_llm, tools=all_tools)
+    out = g.invoke({"messages": [{"role": "user", "content": "cerca"}], "steps": 0})
+    roles = [m["role"] for m in out["messages"]]
+    assert roles == ["user", "assistant", "tool", "assistant"]
+    assert "MIS-002" in out["messages"][2]["content"]
