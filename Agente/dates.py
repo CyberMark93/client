@@ -1,3 +1,5 @@
+import csv
+import json
 import os
 from datetime import date, timedelta
 
@@ -15,6 +17,61 @@ def _parse_date(s):
         return date.fromisoformat(s)
     except (ValueError, TypeError):
         raise _DateError(f"data non valida: {s}")
+
+
+def _parse_holiday(token, source):
+    try:
+        return date.fromisoformat(token)
+    except (ValueError, TypeError):
+        raise _DateError(f"festività non valida in {source}: {token}")
+
+
+def _load_txt(path):
+    result = set()
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            result.add(_parse_holiday(line.split()[0], path))
+    return result
+
+
+def _load_csv(path):
+    result = set()
+    with open(path, encoding="utf-8", newline="") as f:
+        for i, row in enumerate(csv.reader(f)):
+            if not row or not row[0].strip():
+                continue
+            cell = row[0].strip()
+            try:
+                result.add(date.fromisoformat(cell))
+            except ValueError:
+                if i == 0:
+                    continue  # intestazione
+                raise _DateError(f"festività non valida in {path}: {cell}")
+    return result
+
+
+def _load_json(path):
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    result = set()
+    for item in data:
+        token = item["date"] if isinstance(item, dict) else item
+        result.add(_parse_holiday(token, path))
+    return result
+
+
+def load_holidays(path):
+    ext = os.path.splitext(path)[1].lower()
+    if ext == ".txt":
+        return _load_txt(path)
+    if ext == ".csv":
+        return _load_csv(path)
+    if ext == ".json":
+        return _load_json(path)
+    raise _DateError(f"formato festività non supportato: {ext}")
 
 
 def _require(value, operation):

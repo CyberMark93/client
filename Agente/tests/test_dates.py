@@ -50,3 +50,45 @@ def test_schema_ben_formato():
     assert s["function"]["name"] == "date_tool"
     assert s["function"]["parameters"]["required"] == ["operation"]
     assert "deadline" in s["function"]["parameters"]["properties"]["operation"]["enum"]
+
+
+import datetime
+
+import pytest
+
+
+def test_load_txt(tmp_path):
+    p = tmp_path / "h.txt"
+    p.write_text("# commento\n2026-12-25 Natale\n\n2026-01-01\n", encoding="utf-8")
+    assert dates.load_holidays(str(p)) == {datetime.date(2026, 12, 25), datetime.date(2026, 1, 1)}
+
+
+def test_load_csv(tmp_path):
+    p = tmp_path / "h.csv"
+    p.write_text("data,nome\n2026-12-25,Natale\n2026-01-01,Capodanno\n", encoding="utf-8")
+    assert dates.load_holidays(str(p)) == {datetime.date(2026, 12, 25), datetime.date(2026, 1, 1)}
+
+
+def test_load_json(tmp_path):
+    p = tmp_path / "h.json"
+    p.write_text('[{"date":"2026-12-25","name":"Natale"},"2026-01-01"]', encoding="utf-8")
+    assert dates.load_holidays(str(p)) == {datetime.date(2026, 12, 25), datetime.date(2026, 1, 1)}
+
+
+def test_load_malformato(tmp_path):
+    p = tmp_path / "h.txt"
+    p.write_text("2026-99-99\n", encoding="utf-8")
+    with pytest.raises(ValueError):
+        dates.load_holidays(str(p))
+
+
+def test_load_estensione_non_supportata(tmp_path):
+    p = tmp_path / "h.xml"
+    p.write_text("x", encoding="utf-8")
+    with pytest.raises(ValueError):
+        dates.load_holidays(str(p))
+
+
+def test_holidays_file_esempio_caricabile():
+    h = dates.load_holidays(dates.HOLIDAYS_PATH)
+    assert datetime.date(2026, 12, 25) in h
