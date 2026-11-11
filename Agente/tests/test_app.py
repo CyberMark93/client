@@ -15,3 +15,7 @@ def test_handle_turn_accumula_la_cronologia():
     assert roles == ["system", "user", "assistant", "user", "assistant"]
     assert messages[1]["content"] == "prima"
     assert messages[3]["content"] == "seconda"
+
+
+def test_system_prompt_cita_le_note():
+    assert "note" in app.SYSTEM_PROMPT.lower()
