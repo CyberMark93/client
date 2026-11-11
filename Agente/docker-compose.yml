@@ -1,10 +1,29 @@
 services:
   app:
     build: .
+    command: python app.py
     stdin_open: true
     tty: true
     environment:
       - LM_BASE_URL=http://host.docker.internal:1234/v1
       - LM_MODEL=google/gemma-4-e2b
+      - NOTES_API_URL=http://notes-api:8000
+    depends_on:
+      notes-api:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
+  notes-api:
+    build: .
+    command: uvicorn tools.notes_app:app --host 0.0.0.0 --port 8000
+    environment:
+      - NOTES_DB_PATH=/data/notes.db
+    volumes:
+      - notes-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+volumes:
+  notes-data:
